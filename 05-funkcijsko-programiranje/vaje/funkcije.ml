@@ -4,7 +4,9 @@
 Namig: Definirajte pomožno funkcijo za obračanje seznamov.
 [*----------------------------------------------------------------------------*)
 
-let rec reverse = ()
+let rec reverse = function
+  | [] -> []
+  | first :: rest -> (reverse rest) @ [first]
 
 (*----------------------------------------------------------------------------*]
  Funkcija [repeat x n] vrne seznam [n] ponovitev vrednosti [x]. Za neprimerne
@@ -16,7 +18,12 @@ let rec reverse = ()
  - : string list = []
 [*----------------------------------------------------------------------------*)
 
-let rec repeat = ()
+let rec repeat x n =
+  if n > 0 then 
+    [x] @ repeat x (n - 1)
+  else
+    []
+  
 
 (*----------------------------------------------------------------------------*]
  Funkcija [range] sprejme število in vrne seznam vseh celih števil od 0 do
@@ -26,8 +33,13 @@ let rec repeat = ()
  # range 10;;
  - : int list = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10]
 [*----------------------------------------------------------------------------*)
-
-let rec range = ()
+let range n =
+  let rec r i l = 
+    if i = n then
+      l @ [n]
+    else
+      r (i + 1) (l @ [i])
+  in r 0 []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map f list] sprejme seznam [list] oblike [x0; x1; x2; ...] in
@@ -39,7 +51,11 @@ let rec range = ()
  - : int list = [2; 3; 4; 5; 6]
 [*----------------------------------------------------------------------------*)
 
-let rec map = ()
+let map f list = 
+  let rec r tomap mapped = match tomap with 
+    | [] -> mapped
+    | x::xs -> r xs (mapped @ [f x])
+  in r list []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map_tlrec] je repno rekurzivna različica funkcije [map].
@@ -67,7 +83,11 @@ let rec map_tlrec = ()
  - : int list = [0; 1; 2; 5; 6; 7]
 [*----------------------------------------------------------------------------*)
 
-let rec mapi = ()
+let mapi f list =
+  let rec r i todo finished = match todo with
+    | [] -> finished
+    | x::xs -> r (i + 1) xs (finished @ [f x i])
+  in r 0 list []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [zip] sprejme dva seznama in vrne seznam parov istoležnih
@@ -79,7 +99,13 @@ let rec mapi = ()
  Exception: Failure "Different lengths of input lists.".
 [*----------------------------------------------------------------------------*)
 
-let rec zip = ()
+let zip l1 l2 = 
+  let rec r l1 l2 finished = match l1, l2 with
+    | [], [] -> finished
+    | [], _ -> failwith "Different lengths of input lists."
+    | _, [] -> failwith "Different lengths of input lists."
+    | x::xs, y::ys -> r xs ys (finished @ [(x, y)])
+  in r l1 l2 []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [unzip] je inverz funkcije [zip], torej sprejme seznam parov
@@ -89,7 +115,11 @@ let rec zip = ()
  - : int list * string list = ([0; 1; 2], ["a"; "b"; "c"])
 [*----------------------------------------------------------------------------*)
 
-let rec unzip = ()
+let unzip l = 
+  let rec r todo first second = match todo with
+    | [] -> first, second
+    | (x, y) :: rest -> r rest (first @ [x]) (second @ [y])
+  in r l [] []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [unzip_tlrec] je repno rekurzivna različica funkcije [unzip].
@@ -113,7 +143,9 @@ let rec unzip_tlrec = ()
  - : int = 12
 [*----------------------------------------------------------------------------*)
 
-let rec loop = ()
+let rec loop condition f x =
+  if condition x then loop condition f (f x)
+  else x
 
 (*----------------------------------------------------------------------------*]
  Funkcija [fold_left_no_acc f list] sprejme seznam [x0; x1; ...; xn] in
@@ -125,7 +157,14 @@ let rec loop = ()
  - : string = "FICUS"
 [*----------------------------------------------------------------------------*)
 
-let rec fold_left_no_acc = ()
+let fold_left_no_acc f list =
+  let rec r list result = match list with 
+    | [] -> result
+    | x::xs -> r xs (f result x)
+  in match list with
+    | [] -> failwith "short"
+    | [a] -> failwith "short"
+    | x::xs -> r xs x
 
 (*----------------------------------------------------------------------------*]
  Funkcija [apply_sequence f x n] vrne seznam zaporednih uporab funkcije [f] na
@@ -139,7 +178,11 @@ let rec fold_left_no_acc = ()
  - : int list = []
 [*----------------------------------------------------------------------------*)
 
-let rec apply_sequence = ()
+let apply_sequence f x n = 
+  let rec r x i current =
+    if i <= 0 then current
+    else r (f x) (i - 1) (current @ [f x])
+  in r x n []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [filter f list] vrne seznam elementov [list], pri katerih funkcija [f]
@@ -149,7 +192,12 @@ let rec apply_sequence = ()
  - : int list = [4; 5]
 [*----------------------------------------------------------------------------*)
 
-let rec filter = ()
+let filter f list =
+  let rec r todo finished = match todo with
+    | [] -> finished
+    | x::xs when f x -> r xs (finished @ [x])
+    | x::xs -> r xs finished
+  in r list []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [exists] sprejme seznam in funkcijo, ter vrne vrednost [true] čim
@@ -162,7 +210,12 @@ let rec filter = ()
  - : bool = false
 [*----------------------------------------------------------------------------*)
 
-let rec exists = ()
+let exists f list =
+  let rec r todo = match todo with
+    | [] -> false
+    | x::xs when f x -> true
+    | x::xs -> r xs
+  in r list
 
 (*----------------------------------------------------------------------------*]
  Funkcija [first f default list] vrne prvi element seznama, za katerega
@@ -175,4 +228,9 @@ let rec exists = ()
  - : int = 0
 [*----------------------------------------------------------------------------*)
 
-let rec first = ()
+let first f default list = 
+  let rec r todo = match todo with
+    | [] -> default
+    | x::xs when f x -> x
+    | x::xs -> r xs
+  in r list
