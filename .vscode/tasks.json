@@ -22,7 +22,10 @@
             },
             "osx": {
                 "command": "ocaml -init \"${file}\""
-            }
+            },
+            "problemMatcher": [
+                "$tsc"
+            ]
         }
     ]
 }
