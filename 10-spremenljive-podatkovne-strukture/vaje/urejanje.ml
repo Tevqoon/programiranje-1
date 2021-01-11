@@ -9,6 +9,11 @@
  val l : int list = [0; 1; 0; 4; 0; 9; 1; 2; 5; 4]
 [*----------------------------------------------------------------------------*)
 
+let randlist len max =
+    let rec r l lst = match l with
+        | 0 -> lst
+        | x -> r (l - 1) ((Random.int max) :: lst)
+    in r len []
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Sedaj lahko s pomočjo [randlist] primerjamo našo urejevalno funkcijo (imenovana
@@ -35,13 +40,21 @@
  - : int list = [7]
 [*----------------------------------------------------------------------------*)
 
+let rec insert y xs = match xs with 
+    | [] -> [y]
+    | x::xs when y < x -> y::x::xs
+    | x::xs -> x :: (insert y xs)
 
 (*----------------------------------------------------------------------------*]
  Prazen seznam je že urejen. Funkcija [insert_sort] uredi seznam tako da
  zaporedoma vstavlja vse elemente seznama v prazen seznam.
 [*----------------------------------------------------------------------------*)
 
-
+let insert_sort lst =
+    let rec r todo aux = match todo with
+        | [] -> aux
+        | x::xs -> r xs (insert x aux)
+    in r lst []
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*]
  Urejanje z Izbiranjem
@@ -52,6 +65,15 @@
  najmanjši element v [list] in seznam [list'] enak [list] z odstranjeno prvo
  pojavitvijo elementa [z]. V primeru praznega seznama vrne [None]. 
 [*----------------------------------------------------------------------------*)
+
+let min_and_rest list = 
+    let rec r c_min l = function
+        | [] -> (int_of_float c_min, l)
+        | x::xs when (float_of_int x) < c_min -> r (float_of_int x) l xs
+        | x::xs -> r c_min (l @ [x]) xs
+    in match list with
+        | [] -> None
+        | lst -> Some (r infinity [] lst)
 
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
@@ -72,7 +94,11 @@
  Namig: Uporabi [min_and_rest] iz prejšnje naloge.
 [*----------------------------------------------------------------------------*)
 
-
+let selection_sort l = 
+    let rec r todo acc = match min_and_rest todo with   
+        | None -> acc
+        | Some (m, tail) -> r tail (m::acc)
+    in List.rev (r l [])
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*]
  Urejanje z Izbiranjem na Tabelah
