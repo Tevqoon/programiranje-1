@@ -21,6 +21,29 @@ let test_matrix =
      [| 2 ; 4 ; 5 |];
      [| 7 ; 0 ; 1 |] |]
 
+type path = Empty | Right | Down
+
+let max_cheese matrix = 
+  let h = Array.length matrix in
+  let memo = Array.make_matrix (h + 1) (h + 1) (0, None) in
+  for row_i = (h - 1) downto 0 do
+    for col_i = (h - 1) downto 0 do
+      let right, path_right = memo.(row_i).(col_i + 1) in
+      let down, path_down = memo.(row_i + 1).(col_i) in
+      if right > down then
+        memo.(row_i).(col_i) <- matrix.(row_i).(col_i) + right, Some Right
+      else 
+        memo.(row_i).(col_i) <- matrix.(row_i).(col_i) + down, Some Down
+    done;
+  done;
+  let rec walk_path acc x y = match memo.(x).(y) with
+    | _, None -> List.rev (List.tl acc)
+    | _, Some Down -> walk_path (Down::acc) (x + 1) y
+    | _, Some Right -> walk_path (Right::acc) x (y + 1)
+    | _ -> failwith "how'd'ya get here"
+  in walk_path [] 0 0
+
+
 (*----------------------------------------------------------------------------*]
  Rešujemo problem sestavljanja alternirajoče obarvanih stolpov. Imamo štiri
  različne tipe gradnikov, dva modra in dva rdeča. Modri gradniki so višin 2 in
