@@ -10,7 +10,21 @@ from functools import lru_cache
 
 
 def najdaljse_narascajoce_podzaporedje(sez):
-    return None
+    @lru_cache(maxsize=None)
+    def podzaporedje(i, zadnji):
+        l = [] #???
+        if i >= len(l):
+            return []
+        if l[i] >= zadnji:
+            vzamemo = [l[i]] + podzaporedje(i + 1, l[i])
+            ne_vzamemo = podzaporedje(i + 1, zadnji)
+            if len(vzamemo) >= len(ne_vzamemo):
+                return vzamemo
+            return ne_vzamemo
+        else: # sez[i] < zadnji
+            # Gremo naprej ~ ali začnemo novo zaporedje, kar se ne splača
+            return podzaporedje(i + 1, zadnji)
+
 
 ###############################################################################
 # Nepreviden študent je pustil robotka z umetno inteligenco nenadzorovanega.

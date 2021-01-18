@@ -29,19 +29,6 @@ let iterate f p starting =
         value := f !value;
     done; !value
 
-let iteratee f p starting = (*Problem: seq je implementiran rekurzivno, poleg rev in prijateljev *)
-    Seq.unfold (fun x -> if p x then None else Some (x, f x)) starting
-    |> of_seq |> rev |> hd |> f
-
-let iterateee f p starting = (*Problem: potencialno bi število aplikacij f bilo daljše od max_int *)
-    let value = ref starting in
-    try
-        for i = 0 to max_int do
-            value := f !value;
-            if p !value then failwith ""; done;
-        starting
-    with Failure _ -> !value
-
 (*Naloga 2*)
 
 type 'a improved_list = Empty | Node of ('a array * 'a improved_list)
@@ -83,5 +70,19 @@ let update ilst index new_val =
 
 (*Naloga 3*)
 
+let francka_b n korita =
+    let l = length korita in
+    let minimal = l + (fold_left (+) 0 korita) - 1 in
+    if minimal > n then 0 else
+    let remaining = n - minimal in
+    let spaces = l + 1 in
+    (*Postavimo minimalna korita in preverimo možne postavitve preostalih praznih mest.*)
+    let rec partition_into_spaces n k = match n, k with (*assert n > 0*)
+        | 1, k -> k
+        | n, k -> let prev = partition_into_spaces (pred n) k in
+            k * prev
+    in partition_into_spaces remaining spaces
 
-
+let francka_a n m l =
+    let korita = List.init m (Fun.const l) in
+    francka_b n korita

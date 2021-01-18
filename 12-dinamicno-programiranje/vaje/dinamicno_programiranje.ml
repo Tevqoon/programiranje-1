@@ -43,6 +43,24 @@ let max_cheese matrix =
     | _ -> failwith "how'd'ya get here"
   in walk_path [] 0 0
 
+(*Najdaljše naraščajoče podzaporedje*)
+
+let test_list = [|2;3;6;8;4;4;6;7;12;8;9|]
+(* rezultat [2, 3, 4, 4, 6, 7, 8, 9]. *)
+let test_list' = [|1;2;3;4;5;0|]
+
+let descending_subseq_from array start = 
+  let ret = Stack.create () in
+  Stack.push array.(start) ret;
+  for i = (pred start) downto 0 do
+    if array.(i) <= Stack.top ret then Stack.push array.(i) ret;
+  done;
+  ret |> Stack.to_seq |> List.of_seq
+
+let subseq arr = 
+  let l = Array.length arr in
+  Array.init l (fun i -> descending_subseq_from arr i)
+  |> Array.fold_left (fun x y -> if List.length y > List.length x then y else x) []
 
 (*----------------------------------------------------------------------------*]
  Rešujemo problem sestavljanja alternirajoče obarvanih stolpov. Imamo štiri
