@@ -1,14 +1,16 @@
+open List
+
 (* =================== *)
 (* 1. naloga: funkcije *)
 (* =================== *)
 
-let is_root = "dopolni me"
+let is_root x y = x * x = y 
 
-let pack3 = "dopolni me"
+let pack3 a b c = (a, b, c) 
 
-let sum_if_not = "dopolni me"
+let sum_if_not p lst = fold_left (fun a x -> if p x then a else a + x) 0 lst
 
-let apply = "dopolni me"
+let apply funcs els = rev @@ rev_map (fun e -> rev @@ rev_map (fun f -> f e) funcs) els
 
 (* ======================================= *)
 (* 2. naloga: podatkovni tipi in rekurzija *)

@@ -75,13 +75,12 @@ let francka_b n korita =
     let minimal = l + (fold_left (+) 0 korita) - 1 in
     if minimal > n then 0 else
     let remaining = n - minimal in
-    let spaces = l + 1 in
     (*Postavimo minimalna korita in preverimo možne postavitve preostalih praznih mest.*)
     let rec partition_into_spaces n k = match n, k with (*assert n > 0*)
         | 1, k -> k
         | n, k -> let prev = partition_into_spaces (pred n) k in
             k * prev
-    in partition_into_spaces remaining spaces
+    in partition_into_spaces remaining (succ l)
 
 let francka_a n m l =
     let korita = List.init m (Fun.const l) in
